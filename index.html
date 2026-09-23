@@ -219,7 +219,7 @@
    Ganti dengan URL Aplikasi Web Apps Script kamu (.../exec) agar dasbor
    membaca DAN menulis balik ke Google Sheets. Kalau dikosongkan, dasbor
    memakai data cadangan offline dan mode edit dinonaktifkan. */
-const API_URL = "https://script.google.com/macros/s/AKfycbzAPJyX8uax5idtMp2Q1Ju-Fjhfa8vLVToNlWUaFbILyJbCXNVTISu2BZWvvnxDXX-q/exec"; // contoh: "https://script.google.com/macros/s/XXXXXXXX/exec"
+const API_URL = ""; // contoh: "https://script.google.com/macros/s/XXXXXXXX/exec"
 
 const WARNA_PILIHAN = ["#9E1B32", "#2F4858", "#B8862B", "#4B7157"];
 
@@ -235,6 +235,7 @@ const DATA_CADANGAN = {
     {"Wilayah":"Papua","Purbaya–Sherly":120,"Prabowo–Gibran":200,"Arif–Toha":150,"Belum Menentukan":40,"Total Responden":510}
   ],
   totalResponden: 9710,
+  totals: {"Purbaya–Sherly":2700,"Prabowo–Gibran":4080,"Arif–Toha":2175,"Belum Menentukan":755},
   profil: [],
   catatan: [
     "Data bersifat simulasi/fiktif untuk pengujian database.",
@@ -298,7 +299,19 @@ function pemenang(w, pilihan){
   return terbaik;
 }
 
+function pastikanTotals(data){
+  if(data.totals && Object.keys(data.totals).length) return data;
+  const totals = {};
+  data.pilihan.forEach(p => { totals[p] = 0; });
+  data.wilayah.forEach(w => {
+    data.pilihan.forEach(p => { totals[p] += Number(w[p]) || 0; });
+  });
+  data.totals = totals;
+  return data;
+}
+
 function render(data, sumber){
+  data = pastikanTotals(data);
   dataTerkini = data;
   document.getElementById("totalResponden").textContent = data.totalResponden.toLocaleString("id-ID");
   document.getElementById("totalWilayah").textContent = data.wilayah.length;
